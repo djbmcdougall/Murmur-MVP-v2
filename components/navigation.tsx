@@ -53,7 +53,7 @@ export default function Navigation() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-muted bg-card shadow-periwinkle-sm"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-card/95 backdrop-blur-xl shadow-periwinkle-lg"
       aria-label="Main navigation"
     >
       <div className="flex items-center justify-around p-2">
@@ -67,18 +67,37 @@ export default function Navigation() {
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex flex-col items-center justify-center p-2 rounded-md transition-colors",
-                      isActive ? "text-accent" : "text-muted-foreground hover:text-accent",
-                      isActive && "bg-background/70",
+                      "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 relative group",
+                      isActive 
+                        ? "text-accent bg-accent/10 scale-105" 
+                        : "text-muted-foreground hover:text-accent hover:bg-accent/5",
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
-                    <item.icon className="h-6 w-6" />
-                    <span className="text-xs mt-1">{item.name}</span>
+                    <div className={cn(
+                      "relative transition-transform duration-200",
+                      isActive ? "scale-110" : "group-hover:scale-105"
+                    )}>
+                      <item.icon className="h-5 w-5" />
+                      {isActive && (
+                        <div className="absolute inset-0 animate-pulse">
+                          <item.icon className="h-5 w-5 text-accent/30" />
+                        </div>
+                      )}
+                    </div>
+                    <span className={cn(
+                      "text-xs mt-1.5 font-medium transition-all duration-200",
+                      isActive ? "text-accent font-semibold" : "text-muted-foreground"
+                    )}>
+                      {item.name}
+                    </span>
+                    {isActive && (
+                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-accent rounded-full animate-bounce-gentle" />
+                    )}
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="top">
-                  <p>{item.description}</p>
+                <TooltipContent side="top" className="bg-primary text-primary-foreground border-none shadow-lg">
+                  <p className="font-medium">{item.description}</p>
                 </TooltipContent>
               </Tooltip>
             )

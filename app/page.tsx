@@ -169,17 +169,32 @@ export default function HomePage() {
   return (
     <div className="pb-20 min-h-screen bg-gradient-to-br from-surface-white to-background">
       <Header />
-      <main className="container px-4 py-8">
+      <main id="main-content" className="container px-4 py-8" role="main" aria-label="Main content">
         <Tabs defaultValue="for-you" onValueChange={setActiveTab} className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <TabsList className="bg-white/80 backdrop-blur-sm border border-border/50 shadow-sm">
-              <TabsTrigger value="for-you" className="data-[state=active]:bg-accent data-[state=active]:text-white">
+            <TabsList className="bg-white/80 backdrop-blur-sm border border-border/50 shadow-sm" role="tablist" aria-label="Recommendation feeds">
+              <TabsTrigger 
+                value="for-you" 
+                className="data-[state=active]:bg-accent data-[state=active]:text-white"
+                role="tab"
+                aria-controls="for-you-panel"
+              >
                 For You
               </TabsTrigger>
-              <TabsTrigger value="trending" className="data-[state=active]:bg-accent data-[state=active]:text-white">
+              <TabsTrigger 
+                value="trending" 
+                className="data-[state=active]:bg-accent data-[state=active]:text-white"
+                role="tab"
+                aria-controls="trending-panel"
+              >
                 Trending
               </TabsTrigger>
-              <TabsTrigger value="verified" className="data-[state=active]:bg-accent data-[state=active]:text-white">
+              <TabsTrigger 
+                value="verified" 
+                className="data-[state=active]:bg-accent data-[state=active]:text-white"
+                role="tab"
+                aria-controls="verified-panel"
+              >
                 Voice Verified
               </TabsTrigger>
             </TabsList>
@@ -190,15 +205,25 @@ export default function HomePage() {
                 checked={voiceOnly} 
                 onCheckedChange={setVoiceOnly}
                 className="data-[state=checked]:bg-accent"
+                aria-describedby="voice-only-description"
               />
               <Label htmlFor="voice-only" className="flex items-center cursor-pointer">
-                <Mic className="h-4 w-4 mr-2 text-accent" />
+                <Mic className="h-4 w-4 mr-2 text-accent" aria-hidden="true" />
                 <span className="text-sm font-medium">Voice Only</span>
               </Label>
+              <span id="voice-only-description" className="sr-only">
+                Toggle to show only voice-verified recommendations
+              </span>
             </div>
           </div>
 
-          <TabsContent value="for-you" className="animate-fade-in">
+          <TabsContent 
+            value="for-you" 
+            className="animate-fade-in"
+            role="tabpanel"
+            id="for-you-panel"
+            aria-labelledby="for-you-heading"
+          >
             <section aria-labelledby="for-you-heading">
               <div className="mb-8 flex items-center justify-between">
                 <div>
@@ -209,7 +234,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Enhanced Categories */}
-                <div className="flex space-x-3 overflow-x-auto pb-2 -mx-2 px-2" role="tablist">
+                <div className="flex space-x-3 overflow-x-auto pb-2 -mx-2 px-2" role="tablist" aria-label="Category filters">
                   {categories.map((category, index) => (
                     <Button
                       key={category.id}
@@ -219,12 +244,13 @@ export default function HomePage() {
                       aria-selected={category.id === "all"}
                       tabIndex={category.id === "all" ? 0 : -1}
                       style={{ animationDelay: `${index * 0.1}s` }}
+                      aria-label={`Filter by ${category.name}`}
                     >
                       {category.id === "all" ? (
                         <span className="text-base font-medium mb-1">All</span>
                       ) : (
                         <>
-                          <CategoryIcon type={category.type} size={28} className="mb-2" />
+                          <CategoryIcon type={category.type} size={28} className="mb-2" aria-hidden="true" />
                           <span className="text-xs font-medium">{category.name}</span>
                         </>
                       )}
@@ -235,7 +261,8 @@ export default function HomePage() {
 
               {/* Enhanced Recommendations */}
               {isLoading ? (
-                <>
+                <div role="status" aria-label="Loading recommendations">
+                  <span className="sr-only">Loading recommendations...</span>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
                       <RecommendationSkeleton />
@@ -255,7 +282,7 @@ export default function HomePage() {
                       <RecommendationSkeleton />
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -285,17 +312,30 @@ export default function HomePage() {
             </section>
           </TabsContent>
 
-          <TabsContent value="trending" className="animate-fade-in">
+          <TabsContent 
+            value="trending" 
+            className="animate-fade-in"
+            role="tabpanel"
+            id="trending-panel"
+          >
             <div className="h-60 flex flex-col items-center justify-center text-muted-foreground bg-white/50 backdrop-blur-sm rounded-2xl border border-border/50">
-              <div className="text-6xl mb-4">📈</div>
+              <div className="text-6xl mb-4" role="img" aria-label="Trending chart emoji">📈</div>
               <h3 className="text-xl font-semibold mb-2">Trending Soon</h3>
               <p className="text-center max-w-md">Discover what's popular in your area. This feature is coming soon!</p>
             </div>
           </TabsContent>
 
-          <TabsContent value="verified" className="animate-fade-in">
+          <TabsContent 
+            value="verified" 
+            className="animate-fade-in"
+            role="tabpanel"
+            id="verified-panel"
+            aria-labelledby="verified-heading"
+          >
             <div className="mb-6 text-center">
-              <h2 className="text-3xl font-bold font-poppins text-gradient mb-3">Voice Verified Recommendations</h2>
+              <h2 id="verified-heading" className="text-3xl font-bold font-poppins text-gradient mb-3">
+                Voice Verified Recommendations
+              </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Authentic recommendations verified by voice analysis and community trust
               </p>

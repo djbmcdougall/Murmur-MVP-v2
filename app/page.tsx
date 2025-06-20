@@ -167,50 +167,65 @@ export default function HomePage() {
     : recommendations
 
   return (
-    <div className="pb-16">
+    <div className="pb-20 min-h-screen bg-gradient-to-br from-surface-white to-background">
       <Header />
-      <main className="container px-4 py-6">
-        <Tabs defaultValue="for-you" onValueChange={setActiveTab} className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <TabsList>
-              <TabsTrigger value="for-you">For You</TabsTrigger>
-              <TabsTrigger value="trending">Trending</TabsTrigger>
-              <TabsTrigger value="verified">Voice Verified</TabsTrigger>
+      <main className="container px-4 py-8">
+        <Tabs defaultValue="for-you" onValueChange={setActiveTab} className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <TabsList className="bg-white/80 backdrop-blur-sm border border-border/50 shadow-sm">
+              <TabsTrigger value="for-you" className="data-[state=active]:bg-accent data-[state=active]:text-white">
+                For You
+              </TabsTrigger>
+              <TabsTrigger value="trending" className="data-[state=active]:bg-accent data-[state=active]:text-white">
+                Trending
+              </TabsTrigger>
+              <TabsTrigger value="verified" className="data-[state=active]:bg-accent data-[state=active]:text-white">
+                Voice Verified
+              </TabsTrigger>
             </TabsList>
 
-            <div className="flex items-center space-x-2">
-              <Switch id="voice-only" checked={voiceOnly} onCheckedChange={setVoiceOnly} />
-              <Label htmlFor="voice-only" className="flex items-center">
-                <Mic className="h-4 w-4 mr-1 text-primary" />
-                Voice Only
+            <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 shadow-sm">
+              <Switch 
+                id="voice-only" 
+                checked={voiceOnly} 
+                onCheckedChange={setVoiceOnly}
+                className="data-[state=checked]:bg-accent"
+              />
+              <Label htmlFor="voice-only" className="flex items-center cursor-pointer">
+                <Mic className="h-4 w-4 mr-2 text-accent" />
+                <span className="text-sm font-medium">Voice Only</span>
               </Label>
             </div>
           </div>
 
-          <TabsContent value="for-you">
+          <TabsContent value="for-you" className="animate-fade-in">
             <section aria-labelledby="for-you-heading">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 id="for-you-heading" className="text-2xl font-bold">
-                  Recommended For You
-                </h2>
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <h2 id="for-you-heading" className="text-3xl font-bold font-poppins text-gradient mb-2">
+                    Recommended For You
+                  </h2>
+                  <p className="text-muted-foreground">Discover trusted recommendations from your community</p>
+                </div>
 
-                {/* Categories */}
-                <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2" role="tablist">
-                  {categories.map((category) => (
+                {/* Enhanced Categories */}
+                <div className="flex space-x-3 overflow-x-auto pb-2 -mx-2 px-2" role="tablist">
+                  {categories.map((category, index) => (
                     <Button
                       key={category.id}
                       variant="outline"
-                      className="h-auto flex-col py-4 px-6 bg-white min-w-[100px]"
+                      className="h-auto flex-col py-4 px-6 bg-white/90 backdrop-blur-sm min-w-[120px] hover-lift transition-smooth shadow-sm hover:shadow-md border-border/50 animate-fade-in"
                       role="tab"
                       aria-selected={category.id === "all"}
                       tabIndex={category.id === "all" ? 0 : -1}
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       {category.id === "all" ? (
-                        <span className="text-base mb-1">All</span>
+                        <span className="text-base font-medium mb-1">All</span>
                       ) : (
                         <>
-                          <CategoryIcon type={category.type} size={24} className="mb-1" />
-                          <span className="text-xs">{category.name}</span>
+                          <CategoryIcon type={category.type} size={28} className="mb-2" />
+                          <span className="text-xs font-medium">{category.name}</span>
                         </>
                       )}
                     </Button>
@@ -218,30 +233,49 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Recommendations */}
+              {/* Enhanced Recommendations */}
               {isLoading ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <RecommendationSkeleton />
-                    <RecommendationSkeleton />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                      <RecommendationSkeleton />
+                    </div>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                      <RecommendationSkeleton />
+                    </div>
                   </div>
-                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <RecommendationSkeleton />
-                    <RecommendationSkeleton />
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                      <RecommendationSkeleton />
+                    </div>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                      <RecommendationSkeleton />
+                    </div>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                      <RecommendationSkeleton />
+                    </div>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {filteredRecommendations.slice(0, 2).map((recommendation) => (
-                      <article key={recommendation.id}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {filteredRecommendations.slice(0, 2).map((recommendation, index) => (
+                      <article 
+                        key={recommendation.id} 
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
                         <RecommendationCard recommendation={recommendation} />
                       </article>
                     ))}
                   </div>
-                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredRecommendations.slice(2).map((recommendation) => (
-                      <article key={recommendation.id}>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredRecommendations.slice(2).map((recommendation, index) => (
+                      <article 
+                        key={recommendation.id} 
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${(index + 2) * 0.1}s` }}
+                      >
                         <RecommendationCard recommendation={recommendation} />
                       </article>
                     ))}
@@ -251,23 +285,31 @@ export default function HomePage() {
             </section>
           </TabsContent>
 
-          <TabsContent value="trending">
-            <div className="h-40 flex items-center justify-center text-muted-foreground">
-              Trending content would appear here
+          <TabsContent value="trending" className="animate-fade-in">
+            <div className="h-60 flex flex-col items-center justify-center text-muted-foreground bg-white/50 backdrop-blur-sm rounded-2xl border border-border/50">
+              <div className="text-6xl mb-4">📈</div>
+              <h3 className="text-xl font-semibold mb-2">Trending Soon</h3>
+              <p className="text-center max-w-md">Discover what's popular in your area. This feature is coming soon!</p>
             </div>
           </TabsContent>
 
-          <TabsContent value="verified">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold mb-2">Voice Verified Recommendations</h2>
-              <p className="text-muted-foreground">Authentic recommendations verified by voice analysis</p>
+          <TabsContent value="verified" className="animate-fade-in">
+            <div className="mb-6 text-center">
+              <h2 className="text-3xl font-bold font-poppins text-gradient mb-3">Voice Verified Recommendations</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Authentic recommendations verified by voice analysis and community trust
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {recommendations
                 .filter((rec) => rec.verificationTypes?.includes("voice"))
-                .map((recommendation) => (
-                  <article key={recommendation.id}>
+                .map((recommendation, index) => (
+                  <article 
+                    key={recommendation.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 0.15}s` }}
+                  >
                     <RecommendationCard recommendation={recommendation} />
                   </article>
                 ))}

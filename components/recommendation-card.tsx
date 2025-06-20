@@ -129,61 +129,84 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
         : []
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover-lift transition-smooth shadow-periwinkle-sm hover:shadow-periwinkle-md animate-fade-in group">
       {imagesToShow.length > 0 && (
-        <ImageCarousel images={imagesToShow} alt={`Images for ${recommendation.text.substring(0, 20)}...`} />
+        <div className="relative overflow-hidden">
+          <ImageCarousel images={imagesToShow} alt={`Images for ${recommendation.text.substring(0, 20)}...`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </div>
       )}
 
-      <CardContent className="p-4">
-        <div className="mb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Image
-                src={recommendation.user.avatar || "/placeholder.svg"}
-                alt={recommendation.user.name}
-                width={40}
-                height={40}
-                className="h-10 w-10 rounded-full object-cover"
-              />
-              <div>
-                <div className="flex items-center space-x-2">
-                  <p className="font-medium">{recommendation.user.name}</p>
+      <CardContent className="p-6">
+        <div className="mb-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Image
+                  src={recommendation.user.avatar || "/placeholder.svg"}
+                  alt={recommendation.user.name}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-white shadow-md"
+                />
+                {recommendation.verified && (
+                  <div className="absolute -bottom-1 -right-1 bg-success-500 rounded-full p-1">
+                    <CheckCircle className="h-3 w-3 text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-3">
+                  <h3 className="font-semibold text-foreground font-poppins">{recommendation.user.name}</h3>
                   {recommendation.user.trustScore && (
                     <div
                       className={cn(
-                        "flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-bold",
+                        "flex items-center justify-center px-2 py-1 rounded-full text-white text-xs font-bold shadow-sm",
                         getTrustScoreColor(recommendation.user.trustScore),
                       )}
                     >
                       {recommendation.user.trustScore}
                     </div>
                   )}
-                  {recommendation.verified && <CheckCircle className="h-4 w-4 text-secondary" />}
                 </div>
-                <div className="flex items-center text-xs text-muted-foreground">
+                <div className="flex items-center text-xs text-muted-foreground mt-1">
                   <span>2 days ago</span>
+                  {recommendation.verificationTypes && recommendation.verificationTypes.length > 0 && (
+                    <>
+                      <span className="mx-2">•</span>
+                      <div className="flex items-center space-x-1">
+                        {recommendation.verificationTypes.map((type, index) => (
+                          <span key={index} className="text-accent text-xs font-medium">
+                            {type}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 rounded-full hover:bg-muted"
+                size="icon-sm"
+                className="rounded-full hover:bg-muted transition-colors"
                 onClick={() =>
                   isSaved(recommendation.id) ? unsaveMurmur(recommendation.id) : saveMurmur(recommendation.id)
                 }
               >
                 <Bookmark
-                  className={`h-4 w-4 ${isSaved(recommendation.id) ? "fill-blue-500 text-blue-500" : "text-muted-foreground"}`}
+                  className={`h-4 w-4 transition-colors ${isSaved(recommendation.id) ? "fill-accent text-accent" : "text-muted-foreground hover:text-accent"}`}
                 />
               </Button>
               <div
                 className={cn(
-                  "px-2 py-1 rounded-full text-xs font-medium",
+                  "px-3 py-1.5 rounded-full text-xs font-medium shadow-sm",
                   recommendation.sentiment === "Positive"
-                    ? "bg-secondary text-secondary-foreground"
-                    : "bg-destructive text-destructive-foreground",
+                    ? "bg-success-50 text-success-600 border border-success-100"
+                    : recommendation.sentiment === "Negative"
+                      ? "bg-destructive/10 text-destructive border border-destructive/20"
+                      : "bg-muted text-muted-foreground border border-border",
                 )}
               >
                 {recommendation.category}
@@ -191,22 +214,23 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
             </div>
           </div>
 
-          {/* Audio player positioned under user profile */}
-          <div className="mt-4">
+          {/* Enhanced Audio player */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-surface-white to-muted/30 rounded-xl border border-border/50">
             <AudioPlayer
               audioUrl={recommendation.audio}
-              waveformHeight={40}
+              waveformHeight={44}
               showVolumeControl={true}
               showDuration={true}
             />
 
-            {/* Action button positioned under audio player */}
+            {/* Enhanced Action button */}
             {recommendation.actionButton && (
-              <div className="flex justify-center mt-3">
+              <div className="flex justify-center mt-4">
                 <Button
                   onClick={handleActionClick}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full"
+                  variant="gradient"
                   size="sm"
+                  className="px-6 py-2 font-medium"
                 >
                   {getActionIcon(recommendation.actionButton.type)}
                   <span className="ml-2">{recommendation.actionButton.label}</span>
@@ -216,22 +240,30 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
           </div>
         </div>
 
-        {/* Expandable transcription */}
+        {/* Enhanced expandable transcription */}
         <div className="mb-4">
-          <p className="text-sm leading-relaxed">{truncatedText}</p>
+          <div className="prose prose-sm max-w-none">
+            <p className="text-sm leading-relaxed text-foreground/80 font-inter">{truncatedText}</p>
+          </div>
 
           {shouldTruncate && (
-            <div className="flex justify-center mt-1">
+            <div className="flex justify-center mt-3">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 rounded-full"
+                className="h-8 px-3 rounded-full text-xs text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? (
-                  <ChevronUp className="h-5 w-5 stroke-[2.5px]" />
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-1" />
+                    Show less
+                  </>
                 ) : (
-                  <ChevronDown className="h-5 w-5 stroke-[2.5px]" />
+                  <>
+                    <ChevronDown className="h-4 w-4 mr-1" />
+                    Read more
+                  </>
                 )}
               </Button>
             </div>
@@ -239,16 +271,18 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
         </div>
 
         {recommendation.location && (
-          <div className="mb-4 rounded-md bg-muted p-3">
-            <div className="flex items-center text-sm">
-              <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="font-medium">{recommendation.location}</p>
+          <div className="mb-4 p-4 rounded-xl bg-gradient-card border border-border/50 shadow-inner">
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-accent/10 rounded-lg">
+                <MapPin className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-foreground">{recommendation.location}</p>
                 {recommendation.coordinates && (
                   <LocationDistance
                     latitude={recommendation.coordinates.latitude}
                     longitude={recommendation.coordinates.longitude}
-                    className="mt-1"
+                    className="mt-1 text-muted-foreground"
                   />
                 )}
               </div>
@@ -257,23 +291,23 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
         )}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t p-4">
+      <CardFooter className="flex items-center justify-between bg-muted/20 border-t border-border/50 p-4">
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" className="h-9 space-x-1 px-3">
+          <Button variant="soft" size="sm" className="space-x-2">
             <ThumbsUp className="h-4 w-4" />
-            <span>{recommendation.reactions.thumbsUp || 0}</span>
+            <span className="font-medium">{recommendation.reactions.thumbsUp || 0}</span>
           </Button>
-          <Button variant="outline" size="sm" className="h-9 space-x-1 px-3">
-            <Heart className="h-4 w-4 text-accent" />
-            <span>{recommendation.reactions.heart || 0}</span>
+          <Button variant="soft" size="sm" className="space-x-2">
+            <Heart className="h-4 w-4 text-red-500" />
+            <span className="font-medium">{recommendation.reactions.heart || 0}</span>
           </Button>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" className="h-9 space-x-1 px-3" onClick={() => setShowComments(true)}>
+          <Button variant="outline" size="sm" className="space-x-2" onClick={() => setShowComments(true)}>
             <MessageCircle className="h-4 w-4" />
             <span>Comment</span>
           </Button>
-          <Button variant="outline" size="sm" className="h-9 space-x-1 px-3" onClick={() => setShowShare(true)}>
+          <Button variant="outline" size="sm" className="space-x-2" onClick={() => setShowShare(true)}>
             <Share2 className="h-4 w-4" />
             <span>Share</span>
           </Button>

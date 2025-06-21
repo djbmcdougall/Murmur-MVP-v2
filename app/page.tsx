@@ -147,7 +147,7 @@ export default function HomePage() {
   ]
 
   // Add loading state
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false) // Changed from true to false
   const [voiceOnly, setVoiceOnly] = useState(false)
   const [activeTab, setActiveTab] = useState("for-you")
 

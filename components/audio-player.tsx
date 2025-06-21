@@ -42,79 +42,36 @@ export default function AudioPlayer({
   const [isMuted, setIsMuted] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   
-  const fallbackAudioRef = useRef<HTMLAudioElement>(null)
+  // Check if this is a JSON waveform file
+  const isJSONWaveform = audioUrl.includes('.json')
 
   // Ensure component is mounted to prevent hydration issues
   useEffect(() => {
     setIsMounted(true)
-  }, [])
-
-  // Fallback audio element for cases where WaveSurfer fails
-  useEffect(() => {
-    if (!audioUrl || audioUrl.includes('placeholder')) return
-
-    const audio = fallbackAudioRef.current
-    if (!audio) return
-
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration || 180) // fallback duration
+    
+    // For JSON waveform files, set default duration and stop loading
+    if (isJSONWaveform) {
+      setDuration(180) // 3 minutes default
       setIsLoading(false)
     }
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime)
-    }
-
-    const handleEnded = () => {
-      setIsPlaying(false)
-    }
-
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata)
-    audio.addEventListener('timeupdate', handleTimeUpdate)
-    audio.addEventListener('ended', handleEnded)
-
-    // Set fallback duration for placeholder
-    if (audioUrl.includes('placeholder')) {
-      setDuration(180)
-      setIsLoading(false)
-    }
-
-    return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
-      audio.removeEventListener('timeupdate', handleTimeUpdate)
-      audio.removeEventListener('ended', handleEnded)
-    }
-  }, [audioUrl])
+  }, [isJSONWaveform])
 
   const handlePlayPause = useCallback(() => {
-    if (fallbackAudioRef.current && !audioUrl.includes('placeholder')) {
-      if (isPlaying) {
-        fallbackAudioRef.current.pause()
-      } else {
-        fallbackAudioRef.current.play().catch(console.error)
-      }
-    }
+    // For JSON waveforms, just toggle the playing state
+    // The WaveSurfer component will handle the actual "playback" simulation
     setIsPlaying(!isPlaying)
-  }, [isPlaying, audioUrl])
+  }, [isPlaying])
 
   const handleVolumeChange = useCallback((value: number[]) => {
     const newVolume = value[0]
     setVolume(newVolume)
     setIsMuted(newVolume === 0)
-    
-    if (fallbackAudioRef.current) {
-      fallbackAudioRef.current.volume = newVolume
-    }
   }, [])
 
   const toggleMute = useCallback(() => {
     const newMuted = !isMuted
     setIsMuted(newMuted)
-    
-    if (fallbackAudioRef.current) {
-      fallbackAudioRef.current.volume = newMuted ? 0 : volume
-    }
-  }, [isMuted, volume])
+  }, [isMuted])
 
   const formatTime = (timeInSeconds: number) => {
     if (isNaN(timeInSeconds)) return "00:00"
@@ -137,11 +94,6 @@ export default function AudioPlayer({
 
   return (
     <div className={cn("space-y-3", className)}>
-      {/* Hidden fallback audio element */}
-      {!audioUrl.includes('placeholder') && (
-        <audio ref={fallbackAudioRef} src={audioUrl} preload="metadata" />
-      )}
-      
       <div className="flex items-center gap-4">
         {/* Play/Pause Button */}
         <Button

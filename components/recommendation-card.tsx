@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import AudioPlayer from "@/components/audio-player"
 import { useSavedMurmurs } from "@/contexts/saved-murmurs-context"
 import LocationDistance from "@/components/location-distance"
 import CommentDialog from "@/components/comment-dialog"

@@ -78,6 +78,24 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
   const [showShare, setShowShare] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
+  // Prevent hydration issues from browser extensions
+  useEffect(() => {
+    // Remove any browser extension attributes that might cause hydration issues
+    const body = document.body
+    const attributesToRemove = [
+      'data-new-gr-c-s-check-loaded',
+      'data-gr-ext-installed',
+      'data-new-gr-c-s-loaded',
+      'cz-shortcut-listen'
+    ]
+    
+    attributesToRemove.forEach(attr => {
+      if (body.hasAttribute(attr)) {
+        body.removeAttribute(attr)
+      }
+    })
+  }, [])
+
   // Prevent hydration issues
   useEffect(() => {
     setIsMounted(true)

@@ -75,7 +75,7 @@ export default function ProfilePage() {
       category: "Outdoors",
       sentiment: "Positive",
       image: "/placeholder.svg?height=300&width=400&text=Hiking+Trail",
-      audio: "/placeholder.mp3",
+      audio: "/audio/alex-hiking-recommendation.json",
       reactions: {
         thumbsUp: 18,
         heart: 9,

@@ -53,7 +53,7 @@ export default function ProfilePage() {
       category: "Food & Drink",
       sentiment: "Positive",
       image: "/placeholder.svg?height=300&width=400&text=Coffee+Shop",
-      audio: "/placeholder.mp3",
+      audio: "/audio/alex-coffee-recommendation.json",
       reactions: {
         thumbsUp: 24,
         heart: 12,

@@ -63,7 +63,6 @@ export default function DummyWaveform({
           }
           const newProgress = newTime / duration
           setProgress(newProgress)
-          onTimeUpdate(newTime)
           return newTime
         })
       }, 1000)
@@ -72,7 +71,12 @@ export default function DummyWaveform({
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isPlaying, duration, onTimeUpdate])
+  }, [isPlaying, duration])
+
+  // Separate useEffect for onTimeUpdate to avoid render loop
+  useEffect(() => {
+    onTimeUpdate(currentTime)
+  }, [currentTime, onTimeUpdate])
 
   const handleClick = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect()

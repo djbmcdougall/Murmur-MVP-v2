@@ -147,18 +147,12 @@ export default function WaveSurferComponent({
           interact: true,
         })
 
-        // Load with our waveform data
+        // Only load with waveform data, never try to load JSON files as audio
         ws.load('', waveformData)
 
         // Event listeners
         ws.on('ready', () => {
-          // WaveSurfer is ready
-        })
-
-        ws.on('audioprocess', () => {
-          const time = ws.getCurrentTime()
-          setCurrentTime(time)
-          onTimeUpdate(time)
+          // WaveSurfer is ready with our waveform data
         })
 
         ws.on('seek', (progress: number) => {

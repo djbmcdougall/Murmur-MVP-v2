@@ -154,7 +154,7 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
         : []
 
   return (
-    <Card className="overflow-hidden hover-lift transition-smooth shadow-periwinkle-sm hover:shadow-periwinkle-md animate-fade-in group">
+    <Card className="overflow-hidden hover-lift transition-smooth shadow-periwinkle-sm hover:shadow-periwinkle-md animate-fade-in group" suppressHydrationWarning={true}>
       {imagesToShow.length > 0 && (
         <div className="relative overflow-hidden">
           <ImageCarousel images={imagesToShow} alt={`Images for ${recommendation.text.substring(0, 20)}...`} />

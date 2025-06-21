@@ -5,14 +5,19 @@ import { Play, Pause, Volume2, VolumeX } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import dynamic from "next/dynamic"
 
-// Dynamic import for WaveSurfer to avoid SSR issues
-let WaveSurfer: any = null
-if (typeof window !== "undefined") {
-  import("wavesurfer.js").then((module) => {
-    WaveSurfer = module.default
-  })
-}
+// Dynamically import WaveSurfer with no SSR to prevent hydration issues
+const WaveSurferComponent = dynamic(() => import("./wavesurfer-component"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full bg-muted/30 rounded-lg animate-pulse" style={{ height: '44px' }}>
+      <div className="flex items-center justify-center h-full">
+        <div className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+      </div>
+    </div>
+  )
+})
 
 interface AudioPlayerProps {
   audioUrl: string
@@ -35,68 +40,14 @@ export default function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0)
   const [volume, setVolume] = useState(1)
   const [isMuted, setIsMuted] = useState(false)
-  const [wavesurfer, setWavesurfer] = useState<any>(null)
+  const [isMounted, setIsMounted] = useState(false)
   
-  const waveformRef = useRef<HTMLDivElement>(null)
   const fallbackAudioRef = useRef<HTMLAudioElement>(null)
 
-  // Initialize WaveSurfer
+  // Ensure component is mounted to prevent hydration issues
   useEffect(() => {
-    if (!WaveSurfer || !waveformRef.current || !audioUrl) return
-
-    const ws = WaveSurfer.create({
-      container: waveformRef.current,
-      waveColor: 'rgba(123, 145, 201, 0.3)',
-      progressColor: 'rgba(123, 145, 201, 0.8)',
-      cursorColor: 'rgba(123, 145, 201, 1)',
-      barWidth: 2,
-      barRadius: 1,
-      height: waveformHeight,
-      normalize: true,
-      backend: 'WebAudio',
-      responsive: true,
-      interact: true,
-    })
-
-    // Load audio with fallback for placeholder
-    if (audioUrl.includes('placeholder')) {
-      // Generate a realistic waveform pattern for placeholder
-      const peaks = Array.from({ length: 800 }, (_, i) => {
-        const base = Math.sin(i / 50) * 0.5
-        const noise = (Math.random() - 0.5) * 0.3
-        const decay = 1 - (i / 800) * 0.2
-        return (base + noise) * decay
-      })
-      
-      ws.load('', peaks)
-      setDuration(180) // 3 minutes placeholder
-      setIsLoading(false)
-    } else {
-      ws.load(audioUrl)
-    }
-
-    // Event listeners
-    ws.on('ready', () => {
-      setDuration(ws.getDuration())
-      setIsLoading(false)
-    })
-
-    ws.on('audioprocess', () => {
-      setCurrentTime(ws.getCurrentTime())
-    })
-
-    ws.on('finish', () => {
-      setIsPlaying(false)
-    })
-
-    setWavesurfer(ws)
-
-    return () => {
-      if (ws) {
-        ws.destroy()
-      }
-    }
-  }, [audioUrl, waveformHeight])
+    setIsMounted(true)
+  }, [])
 
   // Fallback audio element for cases where WaveSurfer fails
   useEffect(() => {
@@ -106,7 +57,7 @@ export default function AudioPlayer({
     if (!audio) return
 
     const handleLoadedMetadata = () => {
-      setDuration(audio.duration)
+      setDuration(audio.duration || 180) // fallback duration
       setIsLoading(false)
     }
 
@@ -122,6 +73,12 @@ export default function AudioPlayer({
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('ended', handleEnded)
 
+    // Set fallback duration for placeholder
+    if (audioUrl.includes('placeholder')) {
+      setDuration(180)
+      setIsLoading(false)
+    }
+
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
       audio.removeEventListener('timeupdate', handleTimeUpdate)
@@ -130,48 +87,34 @@ export default function AudioPlayer({
   }, [audioUrl])
 
   const handlePlayPause = useCallback(() => {
-    if (wavesurfer) {
-      if (isPlaying) {
-        wavesurfer.pause()
-      } else {
-        wavesurfer.play()
-      }
-      setIsPlaying(!isPlaying)
-    } else if (fallbackAudioRef.current) {
-      // Fallback for placeholder audio
+    if (fallbackAudioRef.current && !audioUrl.includes('placeholder')) {
       if (isPlaying) {
         fallbackAudioRef.current.pause()
       } else {
-        fallbackAudioRef.current.play()
+        fallbackAudioRef.current.play().catch(console.error)
       }
-      setIsPlaying(!isPlaying)
     }
-  }, [wavesurfer, isPlaying])
+    setIsPlaying(!isPlaying)
+  }, [isPlaying, audioUrl])
 
   const handleVolumeChange = useCallback((value: number[]) => {
     const newVolume = value[0]
     setVolume(newVolume)
     setIsMuted(newVolume === 0)
     
-    if (wavesurfer) {
-      wavesurfer.setVolume(newVolume)
-    }
     if (fallbackAudioRef.current) {
       fallbackAudioRef.current.volume = newVolume
     }
-  }, [wavesurfer])
+  }, [])
 
   const toggleMute = useCallback(() => {
     const newMuted = !isMuted
     setIsMuted(newMuted)
     
-    if (wavesurfer) {
-      wavesurfer.setVolume(newMuted ? 0 : volume)
-    }
     if (fallbackAudioRef.current) {
       fallbackAudioRef.current.volume = newMuted ? 0 : volume
     }
-  }, [wavesurfer, isMuted, volume])
+  }, [isMuted, volume])
 
   const formatTime = (timeInSeconds: number) => {
     if (isNaN(timeInSeconds)) return "00:00"
@@ -180,10 +123,24 @@ export default function AudioPlayer({
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
   }
 
+  // Don't render until mounted to prevent hydration issues
+  if (!isMounted) {
+    return (
+      <div className={cn("space-y-3", className)}>
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-muted animate-pulse" />
+          <div className="flex-1 h-11 bg-muted rounded-lg animate-pulse" />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={cn("space-y-3", className)}>
       {/* Hidden fallback audio element */}
-      <audio ref={fallbackAudioRef} src={audioUrl} preload="metadata" />
+      {!audioUrl.includes('placeholder') && (
+        <audio ref={fallbackAudioRef} src={audioUrl} preload="metadata" />
+      )}
       
       <div className="flex items-center gap-4">
         {/* Play/Pause Button */}
@@ -205,18 +162,15 @@ export default function AudioPlayer({
 
         {/* Waveform Container */}
         <div className="flex-1 relative">
-          <div 
-            ref={waveformRef} 
-            className="w-full cursor-pointer transition-all duration-200 hover:scale-[1.02]"
-            style={{ height: `${waveformHeight}px` }}
+          <WaveSurferComponent
+            audioUrl={audioUrl}
+            height={waveformHeight}
+            isPlaying={isPlaying}
+            onPlayPause={handlePlayPause}
+            onTimeUpdate={setCurrentTime}
+            onDurationChange={setDuration}
+            onLoadingChange={setIsLoading}
           />
-          
-          {/* Loading overlay */}
-          {isLoading && (
-            <div className="absolute inset-0 bg-muted/50 rounded-lg flex items-center justify-center">
-              <div className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-            </div>
-          )}
         </div>
 
         {/* Volume Control */}

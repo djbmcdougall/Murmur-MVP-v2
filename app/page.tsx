@@ -121,7 +121,7 @@ export default function HomePage() {
       sentiment: "Negative",
       emotion: "disappointed" as const,
       image: "/recommendations/tech-gadgets-store.jpg",
-      audio: "/placeholder.mp3",
+      audio: "/audio/david-tech-complaint.json",
       reactions: {
         thumbsDown: 8,
         thumbsUp: 2,

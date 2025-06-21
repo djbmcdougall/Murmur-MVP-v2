@@ -32,7 +32,7 @@ export default function HomePage() {
       sentiment: "Positive",
       emotion: "enthusiastic" as const,
       images: ["/recommendations/sarah-coffee-1.jpg", "/recommendations/sarah-coffee-2.jpg"],
-      audio: "/placeholder.mp3",
+      audio: "/audio/sarah-coffee-recommendation.json",
       reactions: {
         thumbsUp: 24,
         heart: 12,

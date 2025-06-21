@@ -122,17 +122,25 @@ export default function AudioWaveform({
       sourceRef.current = source
 
       // Generate more realistic waveform data based on audio characteristics
-      // This is a simplified approach - real implementation would analyze the actual audio
-      const enhancedData = Array(50)
-        .fill(0)
-        .map((_, i) => {
-          // Create a more natural looking waveform with higher values in the middle
-          const position = i / 50
+      // Use deterministic generation to prevent hydration mismatches
+      const generateDeterministicEnhanced = (url: string, length: number = 50) => {
+        const data = []
+        for (let i = 0; i < length; i++) {
+          // Create deterministic values based on URL and index
+          const hash = (url + i + 'enhanced').split('').reduce((a, b) => {
+            a = ((a << 5) - a) + b.charCodeAt(0)
+            return a & a
+          }, 0)
+          const position = i / length
           const centerDistance = Math.abs(position - 0.5)
-          const amplitude = Math.random() * 0.3 + 0.3 - centerDistance * 0.5
-          return amplitude
-        })
+          const normalized = (Math.abs(hash) % 100) / 100
+          const amplitude = normalized * 0.3 + 0.3 - centerDistance * 0.5
+          data.push(Math.max(0.2, Math.min(0.8, amplitude)))
+        }
+        return data
+      }
 
+      const enhancedData = generateDeterministicEnhanced(audioUrl)
       setAudioData(enhancedData)
     }
 

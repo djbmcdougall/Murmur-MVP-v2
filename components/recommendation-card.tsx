@@ -25,7 +25,7 @@ import LocationDistance from "@/components/location-distance"
 import CommentDialog from "@/components/comment-dialog"
 import ShareDialog from "@/components/share-dialog"
 import ImageCarousel from "@/components/image-carousel"
-import { useSavedMurmurs } from "@/contexts/saved-murmurs-context"
+import { AudioErrorBoundary } from "./audio-error-boundary"
 
 interface User {
   name: string

@@ -91,7 +91,7 @@ export default function HomePage() {
       sentiment: "Positive",
       emotion: "enthusiastic" as const,
       image: "/recommendations/midnight-library-book.jpg",
-      audio: "/placeholder.mp3",
+      audio: "/audio/emily-book-recommendation.json",
       reactions: {
         thumbsUp: 32,
         heart: 15,

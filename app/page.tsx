@@ -62,7 +62,7 @@ export default function HomePage() {
       sentiment: "Positive",
       emotion: "satisfied" as const,
       image: "/recommendations/hiking-trail.jpg",
-      audio: "/placeholder.mp3",
+      audio: "/audio/mike-hiking-recommendation.json",
       reactions: {
         thumbsUp: 18,
         heart: 9,

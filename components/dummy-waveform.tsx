@@ -45,13 +45,13 @@ export default function DummyWaveform({
   const duration = 180 // 3 minutes
 
   // Set duration immediately
-  useState(() => {
+  useEffect(() => {
     onDurationChange(duration)
     onLoadingChange(false)
-  })
+  }, [duration, onDurationChange, onLoadingChange])
 
   // Simulate playback progress
-  useState(() => {
+  useEffect(() => {
     let interval: NodeJS.Timeout
     
     if (isPlaying) {
@@ -72,7 +72,7 @@ export default function DummyWaveform({
     return () => {
       if (interval) clearInterval(interval)
     }
-  })
+  }, [isPlaying, duration, onTimeUpdate])
 
   const handleClick = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect()

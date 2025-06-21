@@ -8,16 +8,7 @@ import { Slider } from "@/components/ui/slider"
 import dynamic from "next/dynamic"
 
 // Dynamically import WaveSurfer with no SSR to prevent hydration issues
-const WaveSurferComponent = dynamic(() => import("./wavesurfer-component"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full bg-muted/30 rounded-lg animate-pulse" style={{ height: '44px' }}>
-      <div className="flex items-center justify-center h-full">
-        <div className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-      </div>
-    </div>
-  )
-})
+import DummyWaveform from "./dummy-waveform"
 
 interface AudioPlayerProps {
   audioUrl: string

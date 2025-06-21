@@ -105,11 +105,10 @@ export default function AudioPlayer({
 
         {/* Waveform Container */}
         <div className="flex-1 relative">
-          <WaveSurferComponent
+          <DummyWaveform
             audioUrl={audioUrl}
             height={waveformHeight}
             isPlaying={isPlaying}
-            onPlayPause={handlePlayPause}
             onTimeUpdate={setCurrentTime}
             onDurationChange={setDuration}
             onLoadingChange={setIsLoading}

@@ -76,6 +76,12 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
   const [isExpanded, setIsExpanded] = useState(false)
   const [showComments, setShowComments] = useState(false)
   const [showShare, setShowShare] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Prevent hydration issues
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Determine if text should be truncated
   const shouldTruncate = recommendation.text.length > 150

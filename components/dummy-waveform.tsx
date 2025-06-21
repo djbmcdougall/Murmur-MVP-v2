@@ -94,6 +94,7 @@ export default function DummyWaveform({
       className="w-full cursor-pointer hover:opacity-80 transition-all duration-200"
       style={{ height: `${height}px` }}
       onClick={handleClick}
+      suppressHydrationWarning={true}
     >
       <svg
         width="100%"

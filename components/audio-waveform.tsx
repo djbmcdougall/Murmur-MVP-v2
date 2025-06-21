@@ -71,9 +71,23 @@ export default function AudioWaveform({
     })
 
     // Generate placeholder waveform data until real data is available
-    const placeholderData = Array(50)
-      .fill(0)
-      .map(() => Math.random() * 0.5 + 0.2)
+    // Use deterministic generation to prevent hydration mismatches
+    const generateDeterministicWaveform = (url: string, length: number = 50) => {
+      const data = []
+      for (let i = 0; i < length; i++) {
+        // Create deterministic values based on URL and index
+        const hash = (url + i).split('').reduce((a, b) => {
+          a = ((a << 5) - a) + b.charCodeAt(0)
+          return a & a
+        }, 0)
+        const normalized = (Math.abs(hash) % 100) / 100
+        const value = Math.sin(i * 0.1) * 0.3 + normalized * 0.4 + 0.2
+        data.push(Math.max(0.2, Math.min(0.8, value)))
+      }
+      return data
+    }
+    
+    const placeholderData = generateDeterministicWaveform(audioUrl)
     setAudioData(placeholderData)
 
     return () => {

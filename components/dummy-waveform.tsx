@@ -112,17 +112,8 @@ export default function DummyWaveform({
               width={2}
               height={barHeight}
               rx={1}
-              className={cn(
-                "transition-all duration-200",
-                isPlayed 
-                  ? "fill-gradient-to-t from-accent-blue to-accent-lavender opacity-80" 
-                  : "fill-accent-blue opacity-30"
-              )}
-              style={{
-                fill: isPlayed 
-                  ? 'url(#playedGradient)' 
-                  : 'url(#unplayedGradient)'
-              }}
+              className="transition-all duration-200"
+              fill={isPlayed ? 'url(#playedGradient)' : 'url(#unplayedGradient)'}
             />
           )
         })}

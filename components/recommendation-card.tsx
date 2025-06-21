@@ -240,12 +240,14 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
 
           {/* Enhanced Audio player */}
           <div className="mt-6 p-4 bg-gradient-to-r from-surface-white to-muted/30 rounded-xl border border-border/50">
-            <AudioPlayer
-              audioUrl={recommendation.audio}
-              waveformHeight={44}
-              showVolumeControl={true}
-              showDuration={true}
-            />
+            <AudioErrorBoundary>
+              <AudioPlayer
+                audioUrl={recommendation.audio}
+                waveformHeight={44}
+                showVolumeControl={true}
+                showDuration={true}
+              />
+            </AudioErrorBoundary>
 
             {/* Enhanced Action button */}
             {recommendation.actionButton && (
